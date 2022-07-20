@@ -11,15 +11,15 @@ const Player = () => {
     let wins = 0;
     let losses = 0;
     //we want player name, a score after wins, methods to change scoreboard?
-    const changeScore = (result) => {
-        if(result == 'Win') {
-            wins+=1;
-        }
-        if(result == 'Loss') {
-            losses+=1;
-        }
-    }
-    return { changeScore, wins, losses }
+    // const changeScore = (result) => {
+    //     if(result == 'Win') {
+    //         return wins++;
+    //     }
+    //     if(result == 'Loss') {
+    //         return losses++;
+    //     }
+    // }
+    return { wins, losses }
 };
 
 const p = Player();
@@ -29,10 +29,8 @@ const Gameboard = (() => {
     let board = []; 
     let didIWin = 'not yet';
     const checkWin = () => {
-        let count1 = 0, count2 = 0, count3 = 0, count4 = 0, count5 = 0, count6 = 0, count7 = 0;
-        let count8 = 0, count9 = 0, count10 = 0, count11 = 0, count12 = 0, count13 = 0, count14 = 0;
-        let count15 = 0, count16 = 0;
         for(let a = 0; a < 3; a++) { //top row, left to right #1
+            let count1 = 0, count2 = 0;
             if(board[a].getAttribute('played') == 'true') {
                 count1++;
             }
@@ -49,6 +47,7 @@ const Gameboard = (() => {
             }
         }
         for(let b = 3; b < 6; b++) { //middle row, left to right #2
+            let count3 = 0, count4 = 0;
             if(board[b].getAttribute('played') == 'true' ) {
                 count3++;
             }
@@ -65,6 +64,7 @@ const Gameboard = (() => {
             }
         }
         for(let c = 6; c < 9; c++) { //bottom row, left to right #3
+            let count5 = 0, count6 = 0;
             if(board[c].getAttribute('played') == 'true' ) {
                 count5++;
             }
@@ -81,6 +81,7 @@ const Gameboard = (() => {
             }
         }
         for(let d = 0; d < board.length; d += 3) { //should check leftmost column, top to bottom #4
+            let count7 = 0, count8 = 0;
             if(board[d].getAttribute('played') == 'true' ) {
                 count7++;
             }
@@ -97,6 +98,7 @@ const Gameboard = (() => {
             }
         }
         for(let e = 1; e < board.length; e += 3) { //should check middle column, top to bottom #5
+            let count9 = 0, count10 = 0;
             if(board[e].getAttribute('played') == 'true' ) {
                 count9++;
             }
@@ -113,6 +115,7 @@ const Gameboard = (() => {
             }
         }
         for(let f = 2; f < board.length; f += 3) { //should check rightmost column, top to bottom #6
+            let count11 = 0, count12 = 0;
             if(board[f].getAttribute('played') == 'true' ) {
                 count11++;
             }
@@ -129,6 +132,7 @@ const Gameboard = (() => {
             }
         }
         for(let g = 0; g < board.length; g += 4) { //should check diagonally, left to right downwards (0, 4, 8) #7
+            let count13 = 0, count14 = 0;
             if(board[g].getAttribute('played') == 'true' ) {
                 count13++;
             }
@@ -146,6 +150,7 @@ const Gameboard = (() => {
         }
         for(let h = 2; h < board.length -1; h += 2) { //should check diagonally, right to left downwards (2, 4, 6) #8
             //length -1 here to avoid picking up the last array square
+            let count15 = 0, count16 = 0;
             if(board[h].getAttribute('played') == 'true' ) {
                 count15++;
             }
@@ -170,18 +175,20 @@ const Gameboard = (() => {
         if(didIWin == 'No') {
             msgr.innerHTML = 'You LOSE!';
             //setTimeout(); //something here to delay before starting a new game?
-            p.changeScore('Loss');
+            //p.changeScore('Loss');
+            p.losses++;
             didIWin = 'not yet';
         }
         if(didIWin == 'Yes') {
             msgr.innerHTML = 'You WIN!';
-            p.changeScore('Win');
+            //p.changeScore('Win');
             didIWin = 'not yet';
+            p.wins++;
         }
     }
 
     const opponentPlay = () => {
-        let count = 0;
+        let countOpp = 0;
         const rando = (max) => {
             return Math.floor(Math.random() * max);
         };
@@ -189,12 +196,12 @@ const Gameboard = (() => {
         if(oppChoice.getAttribute('played') == 'false') {
             oppChoice.setAttribute('played', 'opp');
             oppChoice.innerHTML = 'O';
-            checkWin();
-            // count++;
-            //checkWin here
-        } else if (count < 9) {
-            opponentPlay();
-            count++;
+            //if(countOpp > 2) {
+                checkWin(); //checkWin after opponent successfully plays
+            //}
+        } else if (countOpp < 9) { //keeps from looping itself infinitely(?)
+            opponentPlay(); //well, look again
+            countOpp++;
         }
     }
     return { board, checkWin, opponentPlay, didIWin };
@@ -202,6 +209,7 @@ const Gameboard = (() => {
 
 //displayController - will control the flow of the game - renders the contents of the board to the page
 const displayController = (() => {
+    let countPlay = 0;
     const popBoard = () => { //would be cool to adjust size somehow
         let count = 1;
         let toDelete = document.querySelector('.grid');
@@ -235,14 +243,15 @@ const displayController = (() => {
     const play = (square) => {
         //need some way to choose the Xs or Os. maybe a button?
         if(square.getAttribute('played') == 'true') { //should freeze button after playing.
-            //change the innerHTML of button, check to see if someone has won, play the opponents move.
-            let count = 0;
             square.innerHTML = 'X';
-            Gameboard.checkWin();
-            //square.setAttribute('played', 'true');
-            count++;
-            if(count < 4) {
-                Gameboard.opponentPlay();
+            countPlay++;
+            if(countPlay > 3) {
+                Gameboard.checkWin();
+                // we need to only call this after 3 player turns, to update variables correctly (?)
+                //square.setAttribute('played', 'true'); //now we do this within the square button itself
+            }
+            if(countPlay < 5) {
+                Gameboard.opponentPlay(); //attempt to keep opponent from continuously playing after a win or loss.
             }
         } else {
            //do nothing, don't allow the button press to do a thing
