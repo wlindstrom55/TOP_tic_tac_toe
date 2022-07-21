@@ -6,7 +6,7 @@ body {
 
 .container {
     background-color: black;
-    
+    margin-bottom: 20px;
 }
 .grid {
     display:grid;
@@ -21,4 +21,15 @@ body {
 .messager {
     background-color: royalblue;
     color: white;
+}
+
+#start {
+    margin-top: 100px;
+    margin-bottom: 20px;
+}
+
+.score {
+    background-color: black;
+    color: red;
+    border: 4px solid lightcoral;
 }
